@@ -1,35 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export default function App() {
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <main className="container">
+      {/* Header with logo and brand name */}
+      <div className="header">
+        <div className="logo" aria-label="SitaVision logo">
+          {/* Minimal mountain + eye icon */}
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 16l5-8 4 6 3-4 6 10H3Z" stroke="#51c4ff" strokeWidth="1.6" />
+            <circle cx="12" cy="10" r="1.6" fill="#51c4ff"/>
+          </svg>
+        </div>
+        <span className="tag badge">SitaVision</span>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
 
-export default App
+      {/* Hero section */}
+      <section className="hero">
+        <span className="tag">Coming soon</span>
+        <h1>Cameras that see, understand, and act.</h1>
+        <p>
+          We are building software that transforms cameras into intelligent sensors:
+          transportation, cities, sports, and industry.
+        </p>
+      </section>
+
+      {/* Email form for waitlist */}
+      <form
+        className="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const email = e.currentTarget.querySelector('input[name="email"]').value;
+          window.location.href = `mailto:hello@sitavision.com?subject=Waitlist&body=${encodeURIComponent(email)}`;
+        }}
+      >
+        <input className="input" type="email" name="email" required placeholder="Your email" />
+        <button type="submit">Join waitlist</button>
+        <a className="ghost" href="mailto:hello@sitavision.com">Contact us</a>
+      </form>
+
+      {/* Footer */}
+      <p className="footer">© {new Date().getFullYear()} SitaVision</p>
+    </main>
+  );
+}
