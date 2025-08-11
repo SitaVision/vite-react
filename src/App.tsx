@@ -2,45 +2,82 @@ import './App.css';
 
 export default function App() {
   return (
-    <main className="container">
-      {/* Header with logo and brand name */}
-      <div className="header">
-        <div className="logo" aria-label="SitaVision logo">
-          {/* Minimal mountain + eye icon */}
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M3 16l5-8 4 6 3-4 6 10H3Z" stroke="#51c4ff" strokeWidth="1.6" />
-            <circle cx="12" cy="10" r="1.6" fill="#51c4ff"/>
+    <main>
+      {/* --- Top navigation --- */}
+      <header className="nav">
+        <div className="brand">
+          {/* Minimal mountain + eye mark */}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 16l5-8 4 6 3-4 6 10H3Z" stroke="currentColor" strokeWidth="1.6" fill="none"/>
+            <circle cx="12" cy="10" r="1.6" />
           </svg>
+          <span>SitaVision</span>
         </div>
-        <span className="tag badge">SitaVision</span>
-      </div>
+        <a className="btn ghost" href="mailto:hello@sitavision.com">Contact</a>
+      </header>
 
-      {/* Hero section */}
+      {/* --- Hero --- */}
       <section className="hero">
-        <span className="tag">Coming soon</span>
-        <h1>Cameras that see, understand, and act.</h1>
+        <span className="pill">Coming soon</span>
+        <h1>Computer vision that runs where it matters.</h1>
         <p>
-          We are building software that transforms cameras into intelligent sensors:
-          transportation, cities, sports, and industry.
+          We turn cameras into intelligent sensors for mobility, cities, sports, and industry —
+          on‑device, privacy‑first.
         </p>
+
+        {/* Simple waitlist form without backend */}
+        <form
+          className="waitlist"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const form = e.currentTarget as HTMLFormElement;
+            const input = form.elements.namedItem('email') as HTMLInputElement | null;
+            const email = input?.value ?? '';
+            window.location.href = `mailto:hello@sitavision.com?subject=Waitlist&body=${encodeURIComponent(email)}`;
+          }}
+        >
+          <input name="email" type="email" required placeholder="Your email" />
+          <button className="btn" type="submit">Join waitlist</button>
+        </form>
+
+        <div className="badges">
+          <span>Edge AI</span>
+          <span>Low‑latency</span>
+          <span>GDPR‑ready</span>
+        </div>
       </section>
 
-      {/* Email form for waitlist */}
-      <form
-        className="form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const email = e.currentTarget.querySelector('input[name="email"]').value;
-          window.location.href = `mailto:hello@sitavision.com?subject=Waitlist&body=${encodeURIComponent(email)}`;
-        }}
-      >
-        <input className="input" type="email" name="email" required placeholder="Your email" />
-        <button type="submit">Join waitlist</button>
-        <a className="ghost" href="mailto:hello@sitavision.com">Contact us</a>
-      </form>
+      {/* --- Features grid --- */}
+      <section className="features">
+        <div className="card">
+          <h3>On‑device processing</h3>
+          <p>Run models on cameras or gateways to cut latency and cloud costs.</p>
+        </div>
+        <div className="card">
+          <h3>Plug‑and‑play APIs</h3>
+          <p>Simple REST/WebSocket endpoints for events, tracks, and analytics.</p>
+        </div>
+        <div className="card">
+          <h3>Privacy by design</h3>
+          <p>No raw video leaves the edge unless you allow it.</p>
+        </div>
+        <div className="card">
+          <h3>Multi‑domain</h3>
+          <p>Transport, traffic, sports, smart facilities — one platform.</p>
+        </div>
+      </section>
 
-      {/* Footer */}
-      <p className="footer">© {new Date().getFullYear()} SitaVision</p>
+      {/* --- CTA --- */}
+      <section className="cta">
+        <h2>Want early access?</h2>
+        <a className="btn" href="mailto:hello@sitavision.com?subject=Early%20access">Request a demo</a>
+      </section>
+
+      {/* --- Footer --- */}
+      <footer className="footer">
+        <span>© {new Date().getFullYear()} SitaVision</span>
+        <a href="https://sitavision.com">sitavision.com</a>
+      </footer>
     </main>
   );
 }
