@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom global style (optional) */
+body {
+  @apply bg-[#0b1220] text-[#eaf2ff] font-sans;
+}
