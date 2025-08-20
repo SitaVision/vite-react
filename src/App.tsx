@@ -1,5 +1,6 @@
 // src/App.tsx
 import './App.css'
+import logo from './assets/sitavision-logo.png'
 
 export default function App() {
   return (
@@ -7,7 +8,7 @@ export default function App() {
       {/* NAVBAR */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <img src="/public/logo.svg" alt="SitaVision logo" className="w-10 h-10" />
+          <img src={logo} alt="SitaVision logo" className="w-10 h-10" />
           <span className="text-xl font-bold">SitaVision</span>
         </div>
         <a
