@@ -9,8 +9,7 @@ export default function App() {
 
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
         <div className="flex items-center">
-          <img src={logo} alt="SitaVision logo" className="w-25 h-25" />
-
+          <img src={logo} alt="SitaVision logo" className="w-20 h-20" />
         </div>
         <a
           href="mailto:e.ansarinejad@gmail.com"
