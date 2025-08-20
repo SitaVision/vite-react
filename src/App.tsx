@@ -7,10 +7,10 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-b from-[#0b1220] to-[#0d1528] text-white font-sans">
       {/* NAVBAR */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <img src={logo} alt="SitaVision logo" className="w-10 h-10" />
-          <span className="text-xl font-bold">SitaVision</span>
+        <div className="flex items-center">
+            <img src={logo} alt="SitaVision logo" className="w-14 h-14" />
         </div>
+
         <a
           href="mailto:hello@sitavision.com"
           className="bg-white text-[#0b1220] font-bold px-4 py-2 rounded hover:bg-gray-200 transition"
