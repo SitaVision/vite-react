@@ -8,7 +8,7 @@ export default function App() {
       {/* NAVBAR */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
         <div className="flex items-center">
-            <img src={logo} alt="SitaVision logo" className="w-14 h-14" />
+            <img src={logo} alt="SitaVision logo" className="w-28 h-28" />
         </div>
 
         <a
