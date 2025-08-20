@@ -8,11 +8,10 @@ export default function App() {
       {/* NAVBAR */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
         <div className="flex items-center">
-            <img src={logo} alt="SitaVision logo" className="w-28 h-28" />
+          <img src={logo} alt="SitaVision logo" className="w-28 h-28" />
         </div>
-
         <a
-          href="mailto:hello@sitavision.com"
+          href="mailto:e.ansarinejad@gmail.com"
           className="bg-white text-[#0b1220] font-bold px-4 py-2 rounded hover:bg-gray-200 transition"
         >
           Contact
@@ -28,7 +27,7 @@ export default function App() {
           Turn cameras into intelligent agents.
         </h1>
         <p className="text-gray-400 text-lg mb-6">
-          SitaVision enables real-time, privacy-first AI vision for mobility, retail, sports, and more.
+          SitaVision transforms any camera into a smart, on-site visual agent — enabling real-time AI analysis across multiple industries.
         </p>
 
         {/* Waitlist form */}
@@ -38,7 +37,7 @@ export default function App() {
             e.preventDefault()
             const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement)?.value
             if (email) {
-              window.location.href = `mailto:hello@sitavision.com?subject=Waitlist&body=${encodeURIComponent(email)}`
+              window.location.href = `mailto:e.ansarinejad@gmail.com?subject=Waitlist&body=${encodeURIComponent(email)}`
             }
           }}
         >
@@ -61,10 +60,22 @@ export default function App() {
       {/* FEATURES */}
       <section className="px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
         {[
-          ['On‑device processing', 'Run models on cameras or edge devices for instant response.'],
-          ['Plug‑and‑play APIs', 'REST/WebSocket APIs for events, detection, and behavior tracking.'],
-          ['Privacy by design', 'No raw video leaves the edge — unless you want it.'],
-          ['Multi‑domain', 'One platform for transport, cities, sports, and smart spaces.'],
+          [
+            'Edge-first AI',
+            'Run computer vision models directly on your existing cameras or edge devices. No cloud required.',
+          ],
+          [
+            'Autonomous agents',
+            'Each camera can detect events, make decisions, and trigger actions without human intervention.',
+          ],
+          [
+            'Domain flexibility',
+            'From mobility to retail and beyond — configure rules and workflows for any environment.',
+          ],
+          [
+            'Built for integration',
+            'Expose real-time insights via REST and WebSocket APIs, ready to plug into your systems.',
+          ],
         ].map(([title, desc]) => (
           <div key={title} className="bg-[#0e1a30] border border-white/10 rounded-xl p-5">
             <h3 className="text-lg font-bold mb-1">{title}</h3>
@@ -77,7 +88,7 @@ export default function App() {
       <section className="px-6 py-20 text-center border-t border-white/10 bg-white/5">
         <h2 className="text-2xl font-bold mb-4">Want early access?</h2>
         <a
-          href="mailto:hello@sitavision.com?subject=Early%20access"
+          href="mailto:e.ansarinejad@gmail.com?subject=Early%20access"
           className="bg-[#51c4ff] text-[#001728] font-bold px-6 py-3 rounded hover:brightness-110 transition"
         >
           Request a demo
