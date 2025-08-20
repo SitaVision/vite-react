@@ -1,83 +1,95 @@
-import './App.css';
+// src/App.tsx
+import './App.css'
 
 export default function App() {
   return (
-    <main>
-      {/* --- Top navigation --- */}
-      <header className="nav">
-        <div className="brand">
-          {/* Minimal mountain + eye mark */}
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M3 16l5-8 4 6 3-4 6 10H3Z" stroke="currentColor" strokeWidth="1.6" fill="none"/>
-            <circle cx="12" cy="10" r="1.6" />
-          </svg>
-          <span>SitaVision</span>
+    <div className="min-h-screen bg-gradient-to-b from-[#0b1220] to-[#0d1528] text-white font-sans">
+      {/* NAVBAR */}
+      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <img src="/assets/sitavision-logo.png" alt="SitaVision logo" className="w-10 h-10" />
+          <span className="text-xl font-bold">SitaVision</span>
         </div>
-        <a className="btn ghost" href="mailto:hello@sitavision.com">Contact</a>
+        <a
+          href="mailto:hello@sitavision.com"
+          className="bg-white text-[#0b1220] font-bold px-4 py-2 rounded hover:bg-gray-200 transition"
+        >
+          Contact
+        </a>
       </header>
 
-      {/* --- Hero --- */}
-      <section className="hero">
-        <span className="pill">Coming soon</span>
-        <h1>Computer vision that runs where it matters.</h1>
-        <p>
-          We turn cameras into intelligent sensors for mobility, cities, sports, and industry —
-          on‑device, privacy‑first.
+      {/* HERO */}
+      <section className="px-6 py-20 text-center max-w-4xl mx-auto">
+        <span className="inline-block border border-white/20 text-sm text-gray-300 px-3 py-1 rounded-full mb-4">
+          Coming soon
+        </span>
+        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
+          Turn cameras into intelligent agents.
+        </h1>
+        <p className="text-gray-400 text-lg mb-6">
+          SitaVision enables real-time, privacy-first AI vision for mobility, retail, sports, and more.
         </p>
 
-        {/* Simple waitlist form without backend */}
+        {/* Waitlist form */}
         <form
-          className="waitlist"
+          className="flex flex-col sm:flex-row justify-center gap-3"
           onSubmit={(e) => {
-            e.preventDefault();
-            const form = e.currentTarget as HTMLFormElement;
-            const input = form.elements.namedItem('email') as HTMLInputElement | null;
-            const email = input?.value ?? '';
-            window.location.href = `mailto:hello@sitavision.com?subject=Waitlist&body=${encodeURIComponent(email)}`;
+            e.preventDefault()
+            const email = (e.currentTarget.elements.namedItem('email') as HTMLInputElement)?.value
+            if (email) {
+              window.location.href = `mailto:hello@sitavision.com?subject=Waitlist&body=${encodeURIComponent(email)}`
+            }
           }}
         >
-          <input name="email" type="email" required placeholder="Your email" />
-          <button className="btn" type="submit">Join waitlist</button>
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="Your email"
+            className="px-4 py-3 rounded-md bg-white/10 text-white border border-white/20 outline-none focus:ring-2 focus:ring-white/30 min-w-[240px]"
+          />
+          <button
+            type="submit"
+            className="bg-[#51c4ff] text-[#001728] font-bold px-5 py-3 rounded-md hover:brightness-110 transition"
+          >
+            Join waitlist
+          </button>
         </form>
-
-        <div className="badges">
-          <span>Edge AI</span>
-          <span>Low‑latency</span>
-          <span>GDPR‑ready</span>
-        </div>
       </section>
 
-      {/* --- Features grid --- */}
-      <section className="features">
-        <div className="card">
-          <h3>On‑device processing</h3>
-          <p>Run models on cameras or gateways to cut latency and cloud costs.</p>
-        </div>
-        <div className="card">
-          <h3>Plug‑and‑play APIs</h3>
-          <p>Simple REST/WebSocket endpoints for events, tracks, and analytics.</p>
-        </div>
-        <div className="card">
-          <h3>Privacy by design</h3>
-          <p>No raw video leaves the edge unless you allow it.</p>
-        </div>
-        <div className="card">
-          <h3>Multi‑domain</h3>
-          <p>Transport, traffic, sports, smart facilities — one platform.</p>
-        </div>
+      {/* FEATURES */}
+      <section className="px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        {[
+          ['On‑device processing', 'Run models on cameras or edge devices for instant response.'],
+          ['Plug‑and‑play APIs', 'REST/WebSocket APIs for events, detection, and behavior tracking.'],
+          ['Privacy by design', 'No raw video leaves the edge — unless you want it.'],
+          ['Multi‑domain', 'One platform for transport, cities, sports, and smart spaces.'],
+        ].map(([title, desc]) => (
+          <div key={title} className="bg-[#0e1a30] border border-white/10 rounded-xl p-5">
+            <h3 className="text-lg font-bold mb-1">{title}</h3>
+            <p className="text-gray-400 text-sm">{desc}</p>
+          </div>
+        ))}
       </section>
 
-      {/* --- CTA --- */}
-      <section className="cta">
-        <h2>Want early access?</h2>
-        <a className="btn" href="mailto:hello@sitavision.com?subject=Early%20access">Request a demo</a>
+      {/* CTA */}
+      <section className="px-6 py-20 text-center border-t border-white/10 bg-white/5">
+        <h2 className="text-2xl font-bold mb-4">Want early access?</h2>
+        <a
+          href="mailto:hello@sitavision.com?subject=Early%20access"
+          className="bg-[#51c4ff] text-[#001728] font-bold px-6 py-3 rounded hover:brightness-110 transition"
+        >
+          Request a demo
+        </a>
       </section>
 
-      {/* --- Footer --- */}
-      <footer className="footer">
+      {/* FOOTER */}
+      <footer className="flex items-center justify-between text-sm text-gray-400 px-6 py-4 border-t border-white/10">
         <span>© {new Date().getFullYear()} SitaVision</span>
-        <a href="https://sitavision.com">sitavision.com</a>
+        <a href="https://sitavision.com" className="hover:underline">
+          sitavision.com
+        </a>
       </footer>
-    </main>
-  );
+    </div>
+  )
 }
