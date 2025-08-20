@@ -11,7 +11,8 @@ export default function App() {
     <img
       src={logo}
       alt="SitaVision logo"
-      className="h-full object-contain max-h-full"
+      className="h-[70px] w-auto object-contain"
+
     />
   </div>
 
