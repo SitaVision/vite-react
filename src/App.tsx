@@ -6,7 +6,6 @@ import {
   Cpu, 
   Zap, 
   ChevronRight, 
-  Info, 
   RefreshCw, 
   Wallet, 
   AlertTriangle,
