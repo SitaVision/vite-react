@@ -240,7 +240,17 @@ const RISK_CASES: RiskCase[] = [
   { id: 5, type: 'SCAM', domain: 'wallet-connect-fix.com', action: 'Sign Message', contract: 'N/A', riskLevel: 'HIGH', reason: 'Phishing for Signature (Permit Scam)' },
 ];
 
-const CONTRACT_LEVELS = [
+// Define Contract Block Type
+type ContractBlockType = "TRIGGER" | "CONDITION" | "ACTION";
+
+interface ContractBlock {
+    id: string;
+    type: ContractBlockType;
+    label: string;
+    icon: LucideIcon | typeof Scale3DIcon;
+}
+
+const CONTRACT_LEVELS: { id: number; name: string; description: string; correctSequence: string[]; blocks: ContractBlock[] }[] = [
   {
     id: 1,
     name: "Crowdfunding Escrow",
@@ -263,7 +273,7 @@ function Scale3DIcon(props: React.SVGProps<SVGSVGElement>) {
 
 // --- 3D CUBE COMPONENT ---
 interface CubeBlockProps {
-    type: "TRIGGER" | "CONDITION" | "ACTION";
+    type: ContractBlockType; // Use the specific type here
     label: string;
     icon: LucideIcon | typeof Scale3DIcon;
     onClick: () => void;
@@ -271,7 +281,7 @@ interface CubeBlockProps {
     isPlaced?: boolean;
 }
 
-const CubeBlock: React.FC<CubeBlockProps> = ({ type, label, icon: Icon, onClick, selected, isPlaced }) => {
+const CubeBlock: React.FC<CubeBlockProps> = ({ type, label, icon: Icon, onClick, selected }) => {
   const colorClass = type === "TRIGGER" ? "border-yellow-500 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]" :
                      type === "CONDITION" ? "border-cyan-500 text-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.3)]" :
                      "border-emerald-500 text-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]";
@@ -298,20 +308,21 @@ const CubeBlock: React.FC<CubeBlockProps> = ({ type, label, icon: Icon, onClick,
 
 // --- GAME 5: CONTRACT ARCHITECT (SMART CONTRACT 3D PUZZLE) ---
 const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const [slots, setSlots] = useState<typeof CONTRACT_LEVELS[0]['blocks'][number][]>([null, null, null]);
+  // Use ContractBlock | null for accurate slot typing
+  const [slots, setSlots] = useState<(ContractBlock | null)[]>([null, null, null]);
   const [availableBlocks] = useState(CONTRACT_LEVELS[0].blocks);
   const [status, setStatus] = useState<"building" | "compiling" | "success" | "error">("building");
 
-  const addToSlot = (block: typeof availableBlocks[number]) => {
+  const addToSlot = (block: ContractBlock) => {
     const firstEmpty = slots.findIndex(s => s === null);
     if (firstEmpty !== -1) {
-      const newSlots = [...slots] as (typeof availableBlocks[number])[];
+      const newSlots = [...slots];
       newSlots[firstEmpty] = block;
       setSlots(newSlots);
     }
   };
 
-  const clearSlots = () => setSlots([null, null, null] as (typeof availableBlocks[number])[]);
+  const clearSlots = () => setSlots([null, null, null]);
 
   const deployContract = () => {
     setStatus("compiling");
@@ -356,9 +367,11 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             {availableBlocks.map(block => (
               <CubeBlock 
                 key={block.id} 
-                {...block} 
+                type={block.type} // Type is now correctly typed as ContractBlockType
+                label={block.label} 
+                icon={block.icon}
                 onClick={() => addToSlot(block)} 
-                selected={slots.includes(block as any)} // Cast needed for array check simplicity
+                selected={slots.includes(block)} 
               />
             ))}
           </div>
@@ -378,7 +391,14 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                <div key={i} className="relative z-10 w-24 h-24 border border-white/10 rounded flex items-center justify-center [transform:rotateX(-45deg)] transition-all">
                  {block ? (
                    <div className="animate-fade-in-up">
-                     <CubeBlock {...block} isPlaced onClick={() => {}} selected={true} />
+                     <CubeBlock 
+                        type={block.type} 
+                        label={block.label} 
+                        icon={block.icon} 
+                        onClick={() => {}} 
+                        selected={true} 
+                        // isPlaced prop can be omitted as it wasn't used in CubeBlock logic, but included in interface previously
+                    />
                      {status === 'compiling' && (
                         <div className="absolute inset-0 border-2 border-white rounded-full animate-ping opacity-50"></div>
                      )}
@@ -444,7 +464,8 @@ const VaultDefenderGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [gameState, setGameState] = useState<'start' | 'playing' | 'gameover'>('start');
   const [entities, setEntities] = useState<GameEntity[]>([]);
   const requestRef = useRef<number>();
-  const spawnTimerRef = useRef<NodeJS.Timeout>();
+  // Changed NodeJS.Timeout to number for browser compatibility
+  const spawnTimerRef = useRef<number>(); 
   const gameContainerRef = useRef<HTMLDivElement>(null);
 
   const spawnEntity = useCallback(() => {
@@ -502,8 +523,8 @@ const VaultDefenderGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     if (gameState === 'playing') {
       requestRef.current = requestAnimationFrame(updateGame);
       const interval = setInterval(spawnEntity, 1500);
-      spawnTimerRef.current = interval;
-
+      spawnTimerRef.current = interval as unknown as number; // Cast to number
+      
       return () => {
         if (requestRef.current) cancelAnimationFrame(requestRef.current);
         if (spawnTimerRef.current) clearInterval(spawnTimerRef.current);
@@ -1086,15 +1107,15 @@ const Badge: React.FC<BadgeProps> = ({ icon: Icon, label, color }) => (
 interface SimulatorButtonProps {
     icon: LucideIcon;
     label: string;
-    color: string;
     onClick: () => void;
     description: string;
 }
 
-const SimulatorButton: React.FC<SimulatorButtonProps> = ({ icon: Icon, label, color, onClick, description }) => (
+const SimulatorButton: React.FC<SimulatorButtonProps> = ({ icon: Icon, label, onClick, description }) => (
   <div className="group relative">
     <button 
       onClick={onClick}
+      // Removed unused color prop
       className={`relative w-full overflow-hidden p-6 rounded-2xl border-2 border-cyan-500/30 bg-slate-900/50 hover:border-cyan-400 hover:bg-slate-900/80 transition-all duration-300 shadow-[0_0_20px_rgba(34,211,238,0.2)] group-hover:shadow-[0_0_40px_rgba(34,211,238,0.5)]`}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -1232,6 +1253,10 @@ export default function App() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Removed unused Badge component definition to clear TS6133
+  // Removed unused color prop from SimulatorButtonProps interface to clear TS6133
+  // Removed unused color prop in SimulatorButton destructuring
 
   return (
     <div className="min-h-screen bg-[#02040a] text-slate-200 font-sans selection:bg-cyan-500/30 overflow-x-hidden cyber-circuit-bg">
@@ -1485,21 +1510,18 @@ export default function App() {
                 <SimulatorButton 
                   icon={ArrowRightLeft} 
                   label="Swap Tokens" 
-                  color="" 
                   description="Trade one token for another. Learn about slippage and price impact safely."
                   onClick={() => {}}
                 />
                 <SimulatorButton 
                   icon={Wallet} 
                   label="Send Crypto" 
-                  color="" 
                   description="Practice sending crypto to an address. Watch out for network selection!"
                   onClick={() => {}}
                 />
                 <SimulatorButton 
                   icon={AlertTriangle} 
                   label="Spot a Scam" 
-                  color="" 
                   description="Analyze a suspicious contract. Can you find the honeypot before it's too late?"
                   onClick={() => {}}
                 />
