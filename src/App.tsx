@@ -270,7 +270,6 @@ interface CubeBlockProps {
     icon: LucideIcon;
     onClick: () => void;
     selected: boolean;
-    isPlaced?: boolean;
 }
 
 const CubeBlock: React.FC<CubeBlockProps> = ({ type, label, icon: Icon, onClick, selected }) => {
@@ -792,6 +791,7 @@ const RiskSentinelGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const nextCase = () => {
     const randomCase = RISK_CASES[Math.floor(Math.random() * RISK_CASES.length)];
+    // Ensure ID is unique for key usage, even if case content repeats
     setCurrentCase({...randomCase, id: Date.now()}); 
     setFeedback(null);
   };
