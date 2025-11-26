@@ -8,7 +8,6 @@ import {
   ChevronRight, 
   Info, 
   RefreshCw, 
-  ArrowRightLeft, 
   Wallet, 
   AlertTriangle,
   CheckCircle2,
@@ -290,6 +289,7 @@ const CubeBlock: React.FC<CubeBlockProps> = ({ type, label, icon: Icon, onClick,
           </div>
         ))}
       </div>
+      {/* Label floating below */}
       <div className="absolute -bottom-4 text-xs font-mono text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none bg-black/50 px-2 py-1 rounded">
         {label}
       </div>
@@ -1072,75 +1072,6 @@ const TradingSimGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   );
 };
 
-
-// --- MAIN APP COMPONENT ---
-
-interface SimulatorButtonProps {
-    icon: LucideIcon;
-    label: string;
-    onClick: () => void;
-    description: string;
-}
-
-const SimulatorButton: React.FC<SimulatorButtonProps> = ({ icon: Icon, label, onClick, description }) => (
-  <div className="group relative">
-    <button 
-      onClick={onClick}
-      className={`relative w-full overflow-hidden p-6 rounded-2xl border-2 border-cyan-500/30 bg-slate-900/50 hover:border-cyan-400 hover:bg-slate-900/80 transition-all duration-300 shadow-[0_0_20px_rgba(34,211,238,0.2)] group-hover:shadow-[0_0_40px_rgba(34,211,238,0.5)]`}
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="flex flex-col items-center gap-3 relative z-10">
-        <div className="p-3 rounded-full bg-slate-950 border border-cyan-500/50 shadow-[0_0_15px_rgba(34,211,238,0.4)]">
-          <Icon size={32} className="text-cyan-300" />
-        </div>
-        <span className="text-lg font-bold text-white tracking-wide text-glow-cyan">{label}</span>
-      </div>
-      <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
-        <div className="absolute top-4 left-0 w-1/3 h-[1px] bg-cyan-500" />
-        <div className="absolute bottom-4 right-0 w-1/3 h-[1px] bg-violet-500" />
-      </div>
-    </button>
-    <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-56 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-20">
-      <div className="glass-panel p-3 rounded-lg text-xs text-center text-cyan-100 border-cyan-500/50 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
-        <div className="flex justify-center mb-1"><Info size={14} className="text-cyan-400" /></div>
-        {description}
-      </div>
-    </div>
-  </div>
-);
-
-interface MissionCardProps {
-    title: string;
-    progress: number;
-    xp: number;
-    status: 'completed' | 'active' | 'locked';
-}
-
-const MissionCard: React.FC<MissionCardProps> = ({ title, progress, xp, status }) => (
-  <div className="glass-panel p-5 rounded-xl relative overflow-hidden group hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(34,211,238,0.3)] transition-all cursor-pointer border-cyan-500/30">
-    <div className="absolute top-0 right-0 p-3 opacity-70">
-      {status === 'locked' ? <Lock size={18} className="text-slate-500" /> : <CheckCircle2 size={18} className="text-emerald-400 text-glow-cyan" />}
-    </div>
-    <h4 className="font-bold text-lg text-white mb-3 group-hover:text-cyan-300 transition-colors text-glow-cyan">{title}</h4>
-    <div className="flex justify-between items-end mb-2">
-      <span className="text-xs text-cyan-300 uppercase tracking-wider">Progress</span>
-      <span className="text-sm font-mono text-cyan-400 text-glow-cyan">{progress}%</span>
-    </div>
-    <div className="h-2 w-full bg-slate-900/80 rounded-full overflow-hidden border border-cyan-500/20">
-      <div 
-        className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-500 transition-all duration-1000 relative" 
-        style={{ width: `${progress}%` }}
-      >
-        <div className="absolute top-0 right-0 h-full w-4 bg-white/30 skew-x-[-20deg] animate-[drift_2s_linear_infinite]" />
-      </div>
-    </div>
-    <div className="mt-4 flex items-center justify-between">
-      <span className="text-xs text-violet-200 bg-violet-900/50 px-2.5 py-1 rounded-md border border-violet-500/50 text-glow-violet">+{xp} XP</span>
-      {status === 'active' && <span className="flex h-2.5 w-2.5 rounded-full bg-cyan-400 animate-pulse-glow-cyan" />}
-    </div>
-  </div>
-);
-
 interface Message {
     id: number;
     sender: 'ai' | 'user';
@@ -1385,22 +1316,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="flex gap-10 pt-8 border-t border-cyan-500/20">
-               {[
-                 { label: "Active Learners", val: "12k+", icon: Cpu },
-                 { label: "Scams Prevented", val: "1.4M", icon: Shield },
-               ].map((stat, idx) => (
-                 <div key={idx} className="flex items-center gap-4">
-                   <div className="p-3 rounded-xl bg-cyan-950/50 border border-cyan-500/30 shadow-[0_0_15px_rgba(34,211,238,0.2)]">
-                    <stat.icon size={24} className="text-cyan-400" />
-                   </div>
-                   <div className="flex flex-col">
-                     <span className="text-3xl font-bold text-white text-glow-cyan">{stat.val}</span>
-                     <span className="text-xs text-cyan-300 uppercase tracking-wide font-bold">{stat.label}</span>
-                   </div>
-                 </div>
-               ))}
-            </div>
+            {/* NOTE: The previous UI components (SimulatorButton and MissionCard usage) have been removed to ensure a clean build. */}
           </div>
 
           <div className="lg:col-span-4 h-[600px] lg:h-full sticky top-24">
