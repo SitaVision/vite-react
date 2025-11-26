@@ -270,6 +270,7 @@ interface CubeBlockProps {
     icon: LucideIcon;
     onClick: () => void;
     selected: boolean;
+    isPlaced?: boolean;
 }
 
 const CubeBlock: React.FC<CubeBlockProps> = ({ type, label, icon: Icon, onClick, selected }) => {
