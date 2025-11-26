@@ -35,8 +35,50 @@ import {
   BarChart3,
   Layers,
   Code2,
-  Check
+  Check,
+  LucideIcon
 } from 'lucide-react';
+
+// --- TYPE DEFINITIONS FOR TSX ---
+
+type GameType = 'defender' | 'memory' | 'risk' | 'trading' | 'contract' | null;
+
+interface GameEntity {
+  id: number;
+  x: number;
+  y: number;
+  speed: number;
+  type: 'good' | 'bad';
+  text: string;
+  icon: LucideIcon;
+}
+
+interface MemoryCard {
+  id: number;
+  icon: LucideIcon;
+  color: string;
+  matched: boolean;
+}
+
+interface RiskCase {
+  id: number;
+  type: 'SCAM' | 'SAFE';
+  domain: string;
+  action: string;
+  contract: string;
+  riskLevel: string;
+  reason: string;
+}
+
+interface Position {
+    type: 'LONG' | 'SHORT';
+    entryPrice: number;
+}
+
+interface Feedback {
+    type: 'success' | 'error';
+    message: string;
+}
 
 // --- Custom CSS for Animations & Glows ---
 const customStyles = `
@@ -161,7 +203,7 @@ const customStyles = `
 `;
 
 // --- GAME CONSTANTS ---
-const DEFENDER_TERMS = {
+const DEFENDER_TERMS: { BAD: { text: string; icon: LucideIcon; }[]; GOOD: { text: string; icon: LucideIcon; }[] } = {
   BAD: [
     { text: "Phishing Link", icon: Skull },
     { text: "Fake Airdrop", icon: AlertTriangle },
@@ -179,7 +221,7 @@ const DEFENDER_TERMS = {
   ]
 };
 
-const MEMORY_ICONS = [
+const MEMORY_ICONS: { id: string; icon: LucideIcon; color: string; }[] = [
   { id: 'btc', icon: Wallet, color: 'text-orange-400' },
   { id: 'eth', icon: Network, color: 'text-blue-400' },
   { id: 'key', icon: Key, color: 'text-yellow-400' },
@@ -190,7 +232,7 @@ const MEMORY_ICONS = [
   { id: 'code', icon: FileCode, color: 'text-pink-400' },
 ];
 
-const RISK_CASES = [
+const RISK_CASES: RiskCase[] = [
   { id: 1, type: 'SCAM', domain: 'unisvvap.org', action: 'Swap Exact Tokens', contract: '0x8b...3f1a (Unverified)', riskLevel: 'CRITICAL', reason: 'Fake domain (Phishing) + Unverified Contract' },
   { id: 2, type: 'SAFE', domain: 'app.aave.com', action: 'Deposit ETH', contract: '0x7f...a4b2 (Verified)', riskLevel: 'LOW', reason: 'Legitimate Protocol' },
   { id: 3, type: 'SCAM', domain: 'opensea-support.io', action: 'Set Approval For All', contract: '0x1a...9c22 (New)', riskLevel: 'HIGH', reason: 'Fake Support Site + Wallet Drainer Permission' },
@@ -214,13 +256,22 @@ const CONTRACT_LEVELS = [
 ];
 
 // Helper for icon
-function Scale3DIcon(props) {
+function Scale3DIcon(props: React.SVGProps<SVGSVGElement>) {
   return <div className="font-bold text-lg">⚖️</div>;
 }
 
 
 // --- 3D CUBE COMPONENT ---
-const CubeBlock = ({ type, label, icon: Icon, onClick, selected, isPlaced }) => {
+interface CubeBlockProps {
+    type: "TRIGGER" | "CONDITION" | "ACTION";
+    label: string;
+    icon: LucideIcon | typeof Scale3DIcon;
+    onClick: () => void;
+    selected: boolean;
+    isPlaced?: boolean;
+}
+
+const CubeBlock: React.FC<CubeBlockProps> = ({ type, label, icon: Icon, onClick, selected, isPlaced }) => {
   const colorClass = type === "TRIGGER" ? "border-yellow-500 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]" :
                      type === "CONDITION" ? "border-cyan-500 text-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.3)]" :
                      "border-emerald-500 text-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]";
@@ -246,30 +297,26 @@ const CubeBlock = ({ type, label, icon: Icon, onClick, selected, isPlaced }) => 
 };
 
 // --- GAME 5: CONTRACT ARCHITECT (SMART CONTRACT 3D PUZZLE) ---
-const SmartContractGame = ({ onClose }) => {
-  const [slots, setSlots] = useState([null, null, null]); // 3 slots for simple contract
+const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [slots, setSlots] = useState<typeof CONTRACT_LEVELS[0]['blocks'][number][]>([null, null, null]);
   const [availableBlocks] = useState(CONTRACT_LEVELS[0].blocks);
-  const [status, setStatus] = useState("building"); // building, compiling, success, error
+  const [status, setStatus] = useState<"building" | "compiling" | "success" | "error">("building");
 
-  const addToSlot = (block) => {
+  const addToSlot = (block: typeof availableBlocks[number]) => {
     const firstEmpty = slots.findIndex(s => s === null);
     if (firstEmpty !== -1) {
-      const newSlots = [...slots];
+      const newSlots = [...slots] as (typeof availableBlocks[number])[];
       newSlots[firstEmpty] = block;
       setSlots(newSlots);
     }
   };
 
-  const clearSlots = () => setSlots([null, null, null]);
+  const clearSlots = () => setSlots([null, null, null] as (typeof availableBlocks[number])[]);
 
   const deployContract = () => {
     setStatus("compiling");
     setTimeout(() => {
-      const currentIds = slots.map(s => s?.id).join(",");
-      const correctIds = CONTRACT_LEVELS[0].correctSequence.join(",");
-      
-      // Check if logic roughly matches (in this simple demo, exact sequence matches types or specific IDs)
-      // Let's enforce exact specific block ID match for simplicity
+      // Logic check for correct sequence of block IDs
       const isCorrect = slots[0]?.id === "trigger" && slots[1]?.id === "condition" && slots[2]?.id === "action";
 
       if (isCorrect) {
@@ -311,6 +358,7 @@ const SmartContractGame = ({ onClose }) => {
                 key={block.id} 
                 {...block} 
                 onClick={() => addToSlot(block)} 
+                selected={slots.includes(block as any)} // Cast needed for array check simplicity
               />
             ))}
           </div>
@@ -330,7 +378,7 @@ const SmartContractGame = ({ onClose }) => {
                <div key={i} className="relative z-10 w-24 h-24 border border-white/10 rounded flex items-center justify-center [transform:rotateX(-45deg)] transition-all">
                  {block ? (
                    <div className="animate-fade-in-up">
-                     <CubeBlock {...block} isPlaced />
+                     <CubeBlock {...block} isPlaced onClick={() => {}} selected={true} />
                      {status === 'compiling' && (
                         <div className="absolute inset-0 border-2 border-white rounded-full animate-ping opacity-50"></div>
                      )}
@@ -389,25 +437,23 @@ const SmartContractGame = ({ onClose }) => {
   );
 };
 
-// --- EXISTING COMPONENTS (VaultDefender, NeuralSync, RiskSentinel, TradingSim) REMAIN UNCHANGED BUT INCLUDED ---
-// ... (Keeping all previous game codes below)
-
-const VaultDefenderGame = ({ onClose }) => {
-  const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(3);
-  const [gameState, setGameState] = useState('start'); // start, playing, gameover
-  const [entities, setEntities] = useState([]);
-  const requestRef = useRef();
-  const spawnTimerRef = useRef();
-  const gameContainerRef = useRef();
+// --- GAME 1: VAULT DEFENDER ---
+const VaultDefenderGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [score, setScore] = useState<number>(0);
+  const [lives, setLives] = useState<number>(3);
+  const [gameState, setGameState] = useState<'start' | 'playing' | 'gameover'>('start');
+  const [entities, setEntities] = useState<GameEntity[]>([]);
+  const requestRef = useRef<number>();
+  const spawnTimerRef = useRef<NodeJS.Timeout>();
+  const gameContainerRef = useRef<HTMLDivElement>(null);
 
   const spawnEntity = useCallback(() => {
-    const isBad = Math.random() > 0.4; // 60% chance of bad guy
+    const isBad = Math.random() > 0.4;
     const type = isBad ? 'BAD' : 'GOOD';
     const term = DEFENDER_TERMS[type][Math.floor(Math.random() * DEFENDER_TERMS[type].length)];
     const startX = Math.random() * 80 + 10;
     
-    const newEntity = {
+    const newEntity: GameEntity = {
       id: Date.now() + Math.random(),
       x: startX,
       y: -10,
@@ -421,11 +467,15 @@ const VaultDefenderGame = ({ onClose }) => {
 
   const updateGame = useCallback(() => {
     setEntities(prevEntities => {
-      const nextEntities = [];
+      const nextEntities: GameEntity[] = [];
       let damageTaken = 0;
 
       prevEntities.forEach(ent => {
-        ent.y += ent.speed;
+        // TypeScript fix: Ensure y exists and is a number before incrementing
+        if (typeof ent.y === 'number') {
+            ent.y += ent.speed;
+        }
+        
         if (ent.y > 90) {
           if (ent.type === 'bad') damageTaken++;
         } else {
@@ -455,13 +505,13 @@ const VaultDefenderGame = ({ onClose }) => {
       spawnTimerRef.current = interval;
 
       return () => {
-        cancelAnimationFrame(requestRef.current);
-        clearInterval(spawnTimerRef.current);
+        if (requestRef.current) cancelAnimationFrame(requestRef.current);
+        if (spawnTimerRef.current) clearInterval(spawnTimerRef.current);
       };
     }
   }, [gameState, spawnEntity, updateGame]);
 
-  const handleEntityClick = (id, type) => {
+  const handleEntityClick = (id: number, type: 'good' | 'bad') => {
     if (gameState !== 'playing') return;
 
     if (type === 'bad') {
@@ -580,18 +630,19 @@ const VaultDefenderGame = ({ onClose }) => {
   );
 };
 
-const NeuralSyncGame = ({ onClose }) => {
-  const [cards, setCards] = useState([]);
-  const [turns, setTurns] = useState(0);
-  const [choiceOne, setChoiceOne] = useState(null);
-  const [choiceTwo, setChoiceTwo] = useState(null);
-  const [disabled, setDisabled] = useState(false);
-  const [matchedCount, setMatchedCount] = useState(0);
-  const [gameWon, setGameWon] = useState(false);
+// --- GAME 2: NEURAL SYNC ---
+const NeuralSyncGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [cards, setCards] = useState<MemoryCard[]>([]);
+  const [turns, setTurns] = useState<number>(0);
+  const [choiceOne, setChoiceOne] = useState<MemoryCard | null>(null);
+  const [choiceTwo, setChoiceTwo] = useState<MemoryCard | null>(null);
+  const [disabled, setDisabled] = useState<boolean>(false);
+  const [matchedCount, setMatchedCount] = useState<number>(0);
+  const [gameWon, setGameWon] = useState<boolean>(false);
 
   // Shuffle cards
   const shuffleCards = () => {
-    const shuffledCards = [...MEMORY_ICONS, ...MEMORY_ICONS]
+    const shuffledCards: MemoryCard[] = [...MEMORY_ICONS, ...MEMORY_ICONS]
       .sort(() => Math.random() - 0.5)
       .map((card) => ({ ...card, id: Math.random(), matched: false }));
 
@@ -604,7 +655,7 @@ const NeuralSyncGame = ({ onClose }) => {
   };
 
   // Handle a choice
-  const handleChoice = (card) => {
+  const handleChoice = (card: MemoryCard) => {
     choiceOne ? setChoiceTwo(card) : setChoiceOne(card);
   };
 
@@ -612,7 +663,8 @@ const NeuralSyncGame = ({ onClose }) => {
   useEffect(() => {
     if (choiceOne && choiceTwo) {
       setDisabled(true);
-      if (choiceOne.icon === choiceTwo.icon) { // Using icon component reference as check
+      // We check for icon identity for the match
+      if (choiceOne.icon === choiceTwo.icon) { 
         setCards(prevCards => {
           return prevCards.map(card => {
             if (card.icon === choiceOne.icon) {
@@ -726,19 +778,21 @@ const NeuralSyncGame = ({ onClose }) => {
   );
 };
 
-const RiskSentinelGame = ({ onClose }) => {
-  const [currentCase, setCurrentCase] = useState(RISK_CASES[0]);
-  const [score, setScore] = useState(0);
-  const [feedback, setFeedback] = useState(null);
-  const [streak, setStreak] = useState(0);
+// --- GAME 3: RISK SENTINEL ---
+const RiskSentinelGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [currentCase, setCurrentCase] = useState<RiskCase>(RISK_CASES[0]);
+  const [score, setScore] = useState<number>(0);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [streak, setStreak] = useState<number>(0);
 
   const nextCase = () => {
     const randomCase = RISK_CASES[Math.floor(Math.random() * RISK_CASES.length)];
-    setCurrentCase({...randomCase, id: Date.now()});
+    // Ensure ID is unique for key usage, even if case content repeats
+    setCurrentCase({...randomCase, id: Date.now()}); 
     setFeedback(null);
   };
 
-  const handleDecision = (decision) => {
+  const handleDecision = (decision: 'APPROVE' | 'REJECT') => {
     const isCorrect = (decision === 'APPROVE' && currentCase.type === 'SAFE') ||
                       (decision === 'REJECT' && currentCase.type === 'SCAM');
     
@@ -843,12 +897,13 @@ const RiskSentinelGame = ({ onClose }) => {
   );
 };
 
-const TradingSimGame = ({ onClose }) => {
-  const [priceHistory, setPriceHistory] = useState([100]);
-  const [balance, setBalance] = useState(10000);
-  const [position, setPosition] = useState(null); // { type: 'LONG' | 'SHORT', entryPrice: number }
-  const [pnl, setPnl] = useState(0);
-  const chartRef = useRef(null);
+// --- GAME 4: TRADING SIMULATOR ---
+const TradingSimGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [priceHistory, setPriceHistory] = useState<number[]>([100]);
+  const [balance, setBalance] = useState<number>(10000);
+  const [position, setPosition] = useState<Position | null>(null);
+  const [pnl, setPnl] = useState<number>(0);
+  const chartRef = useRef<SVGSVGElement>(null);
 
   // Generate price movement
   useEffect(() => {
@@ -858,12 +913,11 @@ const TradingSimGame = ({ onClose }) => {
         const change = (Math.random() - 0.5) * 5; // Volatility
         const newPrice = Math.max(10, lastPrice + change);
         
-        // Keep array size manageable
         const newHistory = [...prev, newPrice];
         if (newHistory.length > 50) newHistory.shift();
         return newHistory;
       });
-    }, 500); // Update every 500ms
+    }, 500);
 
     return () => clearInterval(interval);
   }, []);
@@ -884,7 +938,7 @@ const TradingSimGame = ({ onClose }) => {
     }
   }, [priceHistory, position]);
 
-  const openPosition = (type) => {
+  const openPosition = (type: 'LONG' | 'SHORT') => {
     if (position) return;
     const entryPrice = priceHistory[priceHistory.length - 1];
     setPosition({ type, entryPrice });
@@ -898,7 +952,7 @@ const TradingSimGame = ({ onClose }) => {
   };
 
   // Helper to draw chart path
-  const getPath = () => {
+  const getPath = (): string => {
     if (priceHistory.length < 2) return "";
     const min = Math.min(...priceHistory);
     const max = Math.max(...priceHistory);
@@ -944,7 +998,7 @@ const TradingSimGame = ({ onClose }) => {
             </div>
             
             <div className="h-[300px] w-full bg-slate-950/50 border border-slate-800 rounded-lg relative overflow-hidden">
-               <svg viewBox="0 0 600 300" className="w-full h-full preserve-3d" style={{filter: 'drop-shadow(0 0 10px rgba(34,211,238,0.3))'}}>
+               <svg ref={chartRef} viewBox="0 0 600 300" className="w-full h-full preserve-3d" style={{filter: 'drop-shadow(0 0 10px rgba(34,211,238,0.3))'}}>
                  <defs>
                    <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
                      <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.4" />
@@ -1016,14 +1070,28 @@ const TradingSimGame = ({ onClose }) => {
 
 // --- MAIN APP COMPONENT ---
 
-const Badge = ({ icon: Icon, label, color }) => (
+interface BadgeProps {
+    icon: LucideIcon;
+    label: string;
+    color: string;
+}
+
+const Badge: React.FC<BadgeProps> = ({ icon: Icon, label, color }) => (
   <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border ${color} backdrop-blur-md`}>
     <Icon size={12} />
     {label}
   </div>
 );
 
-const SimulatorButton = ({ icon: Icon, label, color, onClick, description }) => (
+interface SimulatorButtonProps {
+    icon: LucideIcon;
+    label: string;
+    color: string;
+    onClick: () => void;
+    description: string;
+}
+
+const SimulatorButton: React.FC<SimulatorButtonProps> = ({ icon: Icon, label, color, onClick, description }) => (
   <div className="group relative">
     <button 
       onClick={onClick}
@@ -1050,7 +1118,14 @@ const SimulatorButton = ({ icon: Icon, label, color, onClick, description }) => 
   </div>
 );
 
-const MissionCard = ({ title, progress, xp, status }) => (
+interface MissionCardProps {
+    title: string;
+    progress: number;
+    xp: number;
+    status: 'completed' | 'active' | 'locked';
+}
+
+const MissionCard: React.FC<MissionCardProps> = ({ title, progress, xp, status }) => (
   <div className="glass-panel p-5 rounded-xl relative overflow-hidden group hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(34,211,238,0.3)] transition-all cursor-pointer border-cyan-500/30">
     <div className="absolute top-0 right-0 p-3 opacity-70">
       {status === 'locked' ? <Lock size={18} className="text-slate-500" /> : <CheckCircle2 size={18} className="text-emerald-400 text-glow-cyan" />}
@@ -1075,15 +1150,21 @@ const MissionCard = ({ title, progress, xp, status }) => (
   </div>
 );
 
-const AICoachChat = () => {
-  const [messages, setMessages] = useState([
+interface Message {
+    id: number;
+    sender: 'ai' | 'user';
+    text: string;
+}
+
+const AICoachChat: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([
     { id: 1, sender: 'ai', text: "Welcome to SitaVault! I'm your Guardian AI. I'm here to guide you through the crypto universe safely. Ready to set up your first simulated wallet?" }
   ]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState<string>("");
 
   const handleSend = () => {
     if (!input.trim()) return;
-    setMessages([...messages, { id: Date.now(), sender: 'user', text: input }]);
+    setMessages(prev => [...prev, { id: Date.now(), sender: 'user', text: input }]);
     setInput("");
     setTimeout(() => {
       setMessages(prev => [...prev, { 
@@ -1144,9 +1225,9 @@ const AICoachChat = () => {
 };
 
 export default function App() {
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState<boolean>(false);
   // Game State: null, 'defender', 'memory', 'risk', 'trading', 'contract'
-  const [activeGame, setActiveGame] = useState(null);
+  const [activeGame, setActiveGame] = useState<GameType>(null);
   
   useEffect(() => {
     setMounted(true);
