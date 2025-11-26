@@ -5,14 +5,12 @@ import {
   Box, 
   Cpu, 
   Zap, 
-  MessageSquare, 
   ChevronRight, 
   Info, 
   RefreshCw, 
   ArrowRightLeft, 
   Wallet, 
   AlertTriangle,
-  Award,
   CheckCircle2,
   Menu,
   X,
@@ -35,7 +33,6 @@ import {
   BarChart3,
   Layers,
   Code2,
-  Check,
   Scale,
   LucideIcon
 } from 'lucide-react';
@@ -337,6 +334,7 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.1)_0%,rgba(0,0,0,0.8)_80%)] pointer-events-none"></div>
       <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.1)_1px,transparent_1px)] bg-[size:50px_50px] [transform:perspective(1000px)_rotateX(60deg)_translateY(-100px)_scale(2)] opacity-20 pointer-events-none"></div>
 
+      {/* Header */}
       <div className="absolute top-0 w-full p-4 bg-slate-900 border-b border-violet-900/50 flex justify-between items-center z-50">
         <div className="flex items-center gap-3">
           <Layers className="text-violet-400" />
@@ -348,7 +346,10 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><X size={20} /></button>
       </div>
 
+      {/* Main Workspace */}
       <div className="relative z-10 w-full max-w-6xl h-full flex flex-col lg:flex-row p-8 gap-12 items-center justify-center">
+        
+        {/* Left: Component Palette */}
         <div className="w-full lg:w-1/3 h-[400px] glass-panel rounded-2xl p-6 flex flex-col">
           <h3 className="text-sm text-violet-300 font-bold mb-6 uppercase tracking-wider flex items-center gap-2">
             <Box size={16} /> Logic Blocks
@@ -368,9 +369,15 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <div className="mt-4 text-center text-xs text-slate-500">Click block to add to chain</div>
         </div>
 
+        {/* Center: Assembly Line (The "Chain") */}
         <div className="flex-1 flex flex-col items-center justify-center relative">
+          
+          {/* Holographic Platform */}
           <div className="relative w-full max-w-2xl h-[200px] border-2 border-dashed border-violet-500/30 rounded-full flex items-center justify-center gap-8 bg-violet-900/10 [transform:rotateX(45deg)] shadow-[0_0_50px_rgba(139,92,246,0.2)]">
+             
+             {/* Connection Lines */}
              <div className="absolute top-1/2 left-0 w-full h-1 bg-violet-500/20 -translate-y-1/2"></div>
+
              {slots.map((block, i) => (
                <div key={i} className="relative z-10 w-24 h-24 border border-white/10 rounded flex items-center justify-center [transform:rotateX(-45deg)] transition-all">
                  {block ? (
@@ -395,6 +402,7 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
              ))}
           </div>
 
+          {/* Action Panel */}
           <div className="mt-12 flex gap-6">
             <button onClick={clearSlots} className="px-6 py-3 rounded-xl border border-slate-600 text-slate-400 hover:bg-slate-800 transition-colors">
               CLEAR
@@ -784,7 +792,6 @@ const RiskSentinelGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const nextCase = () => {
     const randomCase = RISK_CASES[Math.floor(Math.random() * RISK_CASES.length)];
-    // Ensure ID is unique for key usage, even if case content repeats
     setCurrentCase({...randomCase, id: Date.now()}); 
     setFeedback(null);
   };
