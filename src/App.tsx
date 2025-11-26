@@ -36,6 +36,7 @@ import {
   Layers,
   Code2,
   Check,
+  Scale,
   LucideIcon
 } from 'lucide-react';
 
@@ -247,7 +248,7 @@ interface ContractBlock {
     id: string;
     type: ContractBlockType;
     label: string;
-    icon: LucideIcon | typeof Scale3DIcon;
+    icon: LucideIcon;
 }
 
 const CONTRACT_LEVELS: { id: number; name: string; description: string; correctSequence: string[]; blocks: ContractBlock[] }[] = [
@@ -255,27 +256,21 @@ const CONTRACT_LEVELS: { id: number; name: string; description: string; correctS
     id: 1,
     name: "Crowdfunding Escrow",
     description: "Release funds ONLY if the goal is met by the deadline.",
-    correctSequence: ["trigger", "condition", "action"], // Simplified logic IDs
+    correctSequence: ["trigger", "condition", "action"], 
     blocks: [
       { id: "trigger", type: "TRIGGER", label: "On Deadline", icon: Activity },
-      { id: "condition", type: "CONDITION", label: "If Balance >= Goal", icon: Scale3DIcon },
+      { id: "condition", type: "CONDITION", label: "If Balance >= Goal", icon: Scale },
       { id: "action", type: "ACTION", label: "Release Funds", icon: DollarSign },
       { id: "bad1", type: "ACTION", label: "Refund Everyone", icon: RefreshCw }, // Distractor
     ]
   }
 ];
 
-// Helper for icon
-function Scale3DIcon(props: React.SVGProps<SVGSVGElement>) {
-  return <div className="font-bold text-lg">⚖️</div>;
-}
-
-
 // --- 3D CUBE COMPONENT ---
 interface CubeBlockProps {
-    type: ContractBlockType; // Use the specific type here
+    type: ContractBlockType;
     label: string;
-    icon: LucideIcon | typeof Scale3DIcon;
+    icon: LucideIcon;
     onClick: () => void;
     selected: boolean;
     isPlaced?: boolean;
@@ -298,7 +293,6 @@ const CubeBlock: React.FC<CubeBlockProps> = ({ type, label, icon: Icon, onClick,
           </div>
         ))}
       </div>
-      {/* Label floating below */}
       <div className="absolute -bottom-4 text-xs font-mono text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none bg-black/50 px-2 py-1 rounded">
         {label}
       </div>
@@ -343,7 +337,6 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.1)_0%,rgba(0,0,0,0.8)_80%)] pointer-events-none"></div>
       <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.1)_1px,transparent_1px)] bg-[size:50px_50px] [transform:perspective(1000px)_rotateX(60deg)_translateY(-100px)_scale(2)] opacity-20 pointer-events-none"></div>
 
-      {/* Header */}
       <div className="absolute top-0 w-full p-4 bg-slate-900 border-b border-violet-900/50 flex justify-between items-center z-50">
         <div className="flex items-center gap-3">
           <Layers className="text-violet-400" />
@@ -355,10 +348,7 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded text-slate-400 hover:text-white"><X size={20} /></button>
       </div>
 
-      {/* Main Workspace */}
       <div className="relative z-10 w-full max-w-6xl h-full flex flex-col lg:flex-row p-8 gap-12 items-center justify-center">
-        
-        {/* Left: Component Palette */}
         <div className="w-full lg:w-1/3 h-[400px] glass-panel rounded-2xl p-6 flex flex-col">
           <h3 className="text-sm text-violet-300 font-bold mb-6 uppercase tracking-wider flex items-center gap-2">
             <Box size={16} /> Logic Blocks
@@ -367,7 +357,7 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             {availableBlocks.map(block => (
               <CubeBlock 
                 key={block.id} 
-                type={block.type} // Type is now correctly typed as ContractBlockType
+                type={block.type} 
                 label={block.label} 
                 icon={block.icon}
                 onClick={() => addToSlot(block)} 
@@ -378,15 +368,9 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <div className="mt-4 text-center text-xs text-slate-500">Click block to add to chain</div>
         </div>
 
-        {/* Center: Assembly Line (The "Chain") */}
         <div className="flex-1 flex flex-col items-center justify-center relative">
-          
-          {/* Holographic Platform */}
           <div className="relative w-full max-w-2xl h-[200px] border-2 border-dashed border-violet-500/30 rounded-full flex items-center justify-center gap-8 bg-violet-900/10 [transform:rotateX(45deg)] shadow-[0_0_50px_rgba(139,92,246,0.2)]">
-             
-             {/* Connection Lines */}
              <div className="absolute top-1/2 left-0 w-full h-1 bg-violet-500/20 -translate-y-1/2"></div>
-
              {slots.map((block, i) => (
                <div key={i} className="relative z-10 w-24 h-24 border border-white/10 rounded flex items-center justify-center [transform:rotateX(-45deg)] transition-all">
                  {block ? (
@@ -397,7 +381,6 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                         icon={block.icon} 
                         onClick={() => {}} 
                         selected={true} 
-                        // isPlaced prop can be omitted as it wasn't used in CubeBlock logic, but included in interface previously
                     />
                      {status === 'compiling' && (
                         <div className="absolute inset-0 border-2 border-white rounded-full animate-ping opacity-50"></div>
@@ -412,7 +395,6 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
              ))}
           </div>
 
-          {/* Action Panel */}
           <div className="mt-12 flex gap-6">
             <button onClick={clearSlots} className="px-6 py-3 rounded-xl border border-slate-600 text-slate-400 hover:bg-slate-800 transition-colors">
               CLEAR
@@ -430,7 +412,6 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </button>
           </div>
 
-          {/* Status Readout */}
           {status === 'success' && (
             <div className="mt-8 p-4 bg-emerald-900/50 border border-emerald-500 text-emerald-300 rounded-xl flex items-center gap-3 animate-fade-in-up">
               <CheckCircle2 size={24} />
@@ -449,9 +430,7 @@ const SmartContractGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </div>
             </div>
           )}
-
         </div>
-
       </div>
     </div>
   );
@@ -464,7 +443,6 @@ const VaultDefenderGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [gameState, setGameState] = useState<'start' | 'playing' | 'gameover'>('start');
   const [entities, setEntities] = useState<GameEntity[]>([]);
   const requestRef = useRef<number>();
-  // Changed NodeJS.Timeout to number for browser compatibility
   const spawnTimerRef = useRef<number>(); 
   const gameContainerRef = useRef<HTMLDivElement>(null);
 
@@ -492,7 +470,6 @@ const VaultDefenderGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       let damageTaken = 0;
 
       prevEntities.forEach(ent => {
-        // TypeScript fix: Ensure y exists and is a number before incrementing
         if (typeof ent.y === 'number') {
             ent.y += ent.speed;
         }
@@ -523,7 +500,7 @@ const VaultDefenderGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     if (gameState === 'playing') {
       requestRef.current = requestAnimationFrame(updateGame);
       const interval = setInterval(spawnEntity, 1500);
-      spawnTimerRef.current = interval as unknown as number; // Cast to number
+      spawnTimerRef.current = interval as unknown as number; 
       
       return () => {
         if (requestRef.current) cancelAnimationFrame(requestRef.current);
@@ -684,7 +661,6 @@ const NeuralSyncGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   useEffect(() => {
     if (choiceOne && choiceTwo) {
       setDisabled(true);
-      // We check for icon identity for the match
       if (choiceOne.icon === choiceTwo.icon) { 
         setCards(prevCards => {
           return prevCards.map(card => {
@@ -1091,19 +1067,6 @@ const TradingSimGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
 // --- MAIN APP COMPONENT ---
 
-interface BadgeProps {
-    icon: LucideIcon;
-    label: string;
-    color: string;
-}
-
-const Badge: React.FC<BadgeProps> = ({ icon: Icon, label, color }) => (
-  <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border ${color} backdrop-blur-md`}>
-    <Icon size={12} />
-    {label}
-  </div>
-);
-
 interface SimulatorButtonProps {
     icon: LucideIcon;
     label: string;
@@ -1115,7 +1078,6 @@ const SimulatorButton: React.FC<SimulatorButtonProps> = ({ icon: Icon, label, on
   <div className="group relative">
     <button 
       onClick={onClick}
-      // Removed unused color prop
       className={`relative w-full overflow-hidden p-6 rounded-2xl border-2 border-cyan-500/30 bg-slate-900/50 hover:border-cyan-400 hover:bg-slate-900/80 transition-all duration-300 shadow-[0_0_20px_rgba(34,211,238,0.2)] group-hover:shadow-[0_0_40px_rgba(34,211,238,0.5)]`}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -1253,10 +1215,6 @@ export default function App() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Removed unused Badge component definition to clear TS6133
-  // Removed unused color prop from SimulatorButtonProps interface to clear TS6133
-  // Removed unused color prop in SimulatorButton destructuring
 
   return (
     <div className="min-h-screen bg-[#02040a] text-slate-200 font-sans selection:bg-cyan-500/30 overflow-x-hidden cyber-circuit-bg">
@@ -1434,115 +1392,6 @@ export default function App() {
                    </div>
                  </div>
                ))}
-            </div>
-          </div>
-
-          <div className="relative h-[600px] flex items-center justify-center perspective-1000">
-            <div className="relative w-80 h-80 animate-float z-20">
-              <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/90 to-slate-800/90 rounded-3xl border-2 border-cyan-500/80 shadow-[0_0_80px_rgba(34,211,238,0.4),inset_0_0_40px_rgba(34,211,238,0.2)] backdrop-blur-xl flex items-center justify-center overflow-hidden animate-pulse-glow-cyan">
-                <div className="w-60 h-60 rounded-full border-4 border-dashed border-cyan-400/50 flex items-center justify-center animate-[spin_15s_linear_infinite]">
-                  <div className="w-40 h-40 rounded-full border-2 border-violet-400/60 flex items-center justify-center relative">
-                    <Shield size={80} className="text-cyan-300 filter drop-shadow-[0_0_20px_rgba(34,211,238,1)] relative z-10" />
-                    <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur-md animate-pulse"></div>
-                  </div>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-400/20 to-transparent h-[15%] w-full animate-[scanline_2s_linear_infinite]" />
-                <div className="absolute inset-0 bg-radial-gradient(circle at center, rgba(34,211,238,0.3) 0%, transparent 70%)" />
-              </div>
-              
-              <div className="absolute -inset-8 border-2 border-violet-500/30 rounded-[3rem] -z-10 animate-pulse-glow-violet" />
-              <div className="absolute top-1/2 -right-20 glass-panel p-4 rounded-xl flex items-center gap-3 animate-float-delayed border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                <Lock size={20} className="text-emerald-400 text-glow-cyan" />
-                <div>
-                    <div className="text-xs font-mono text-emerald-300">STATUS</div>
-                    <span className="text-sm font-bold text-emerald-400">SECURE: 100%</span>
-                </div>
-              </div>
-              <div className="absolute -top-12 -left-12 glass-panel p-4 rounded-xl flex items-center gap-3 animate-float border-violet-500/50 shadow-[0_0_20px_rgba(139,92,246,0.3)]">
-                <Box size={20} className="text-violet-400 text-glow-violet" />
-                <div>
-                    <div className="text-xs font-mono text-violet-300">LATEST BLOCK</div>
-                    <span className="text-sm font-bold text-violet-400">#892164</span>
-                </div>
-              </div>
-              <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 glass-panel p-4 rounded-xl flex items-center gap-3 animate-float-delayed border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.3)]" style={{animationDelay: '2s'}}>
-                <Network size={20} className="text-blue-400 text-glow-cyan" />
-                <div>
-                    <div className="text-xs font-mono text-blue-300">NETWORK</div>
-                    <span className="text-sm font-bold text-blue-400">SIMULATED MAINNET</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute w-[600px] h-[600px] border-2 border-cyan-500/10 rounded-full animate-spin-slow" style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}>
-                <div className="absolute top-0 left-1/2 w-4 h-4 bg-cyan-400 rounded-full blur-sm shadow-[0_0_20px_rgba(34,211,238,0.8)]" />
-            </div>
-            <div className="absolute w-[450px] h-[450px] border-2 border-violet-500/10 rounded-full animate-spin-reverse-slow" style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}>
-                <div className="absolute bottom-0 left-1/2 w-4 h-4 bg-violet-400 rounded-full blur-sm shadow-[0_0_20px_rgba(139,92,246,0.8)]" />
-            </div>
-            <div className="absolute w-[750px] h-[750px] border border-blue-500/5 rounded-full animate-[spin_30s_linear_infinite]" />
-          </div>
-        </div>
-
-        <div className="grid lg:grid-cols-12 gap-8 h-auto lg:h-[650px]">
-          <div className="lg:col-span-8 flex flex-col gap-8">
-            <div className="glass-panel rounded-[2rem] p-10 flex-1 flex flex-col justify-center relative overflow-hidden border-2 border-cyan-500/40 shadow-[0_0_50px_rgba(34,211,238,0.2)]">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-70" />
-              <div className="absolute bottom-0 right-0 w-full h-1.5 bg-gradient-to-r from-transparent via-violet-400 to-transparent opacity-70" />
-              
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-                <div>
-                  <h2 className="text-3xl font-bold text-white text-glow-cyan mb-2">Simulator Sandbox</h2>
-                  <p className="text-cyan-200/70 text-sm font-medium">Practice transactions in a safe, controlled environment.</p>
-                </div>
-                <div className="px-5 py-3 bg-slate-900/80 rounded-xl border border-cyan-500/30 shadow-[0_0_20px_rgba(34,211,238,0.2)] flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-cyan-950 border border-cyan-500/50">
-                    <Wallet size={20} className="text-cyan-400" />
-                  </div>
-                  <div>
-                    <div className="text-xs text-cyan-300 font-mono">DEMO BALANCE</div>
-                    <div className="text-xl font-bold text-white text-glow-cyan">5,000.00 USDC</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <SimulatorButton 
-                  icon={ArrowRightLeft} 
-                  label="Swap Tokens" 
-                  description="Trade one token for another. Learn about slippage and price impact safely."
-                  onClick={() => {}}
-                />
-                <SimulatorButton 
-                  icon={Wallet} 
-                  label="Send Crypto" 
-                  description="Practice sending crypto to an address. Watch out for network selection!"
-                  onClick={() => {}}
-                />
-                <SimulatorButton 
-                  icon={AlertTriangle} 
-                  label="Spot a Scam" 
-                  description="Analyze a suspicious contract. Can you find the honeypot before it's too late?"
-                  onClick={() => {}}
-                />
-              </div>
-
-              <div className="mt-10 p-5 bg-cyan-950/40 border-2 border-cyan-500/30 rounded-2xl flex gap-5 items-start relative overflow-hidden shadow-[0_0_25px_rgba(34,211,238,0.15)]">
-                <div className="absolute -left-10 -top-10 w-32 h-32 bg-cyan-400/10 rounded-full blur-3xl" />
-                <div className="p-3 rounded-full bg-cyan-900/50 border border-cyan-500/50 shadow-[0_0_15px_rgba(34,211,238,0.3)] shrink-0">
-                    <Info className="text-cyan-300" size={24} />
-                </div>
-                <div>
-                  <h4 className="text-cyan-200 text-lg font-bold mb-2 text-glow-cyan">Guardian Tip: Malicious Approvals</h4>
-                  <p className="text-cyan-100/70 text-sm leading-relaxed font-medium">Approving a malicious contract can allow it to drain your *entire* wallet. In this simulator, we'll show you exactly what an 'Unlimited Approval' request looks like so you can recognize and reject it in the real world.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-               <MissionCard title="Create Wallet" progress={100} xp={50} status="completed" />
-               <MissionCard title="First Simulated Swap" progress={60} xp={100} status="active" />
-               <MissionCard title="Secure Seed Phrase" progress={0} xp={150} status="locked" />
             </div>
           </div>
 
